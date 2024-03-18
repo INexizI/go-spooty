@@ -1,0 +1,13 @@
+discord:
+  name:
+  token:
+
+spotify:
+  client_id:
+  client_secret:
+  refresh_token:
+
+endpoint:
+  authorize:
+  token:
+  playback_state:
