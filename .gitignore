@@ -21,4 +21,4 @@ vendor/
 .env
 config.yml
 
-log/*
+log/*.log
