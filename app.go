@@ -12,6 +12,8 @@ import (
 type Config struct {
 	Discord struct {
 		Name  string `yaml:"name"`
+		App   string `yaml:"app_id"`
+		Guild string `yaml:"guild_id"`
 		Token string `yaml:"token"`
 	} `yaml:"discord"`
 	Spotify struct {
@@ -49,6 +51,8 @@ func main() {
 	spotify.State = cfg.Endpoint.State
 
 	bot.BotName = cfg.Discord.Name
+	bot.BotApp = cfg.Discord.App
+	bot.BotGuild = cfg.Discord.Guild
 	bot.BotToken = cfg.Discord.Token
 	bot.Run()
 }

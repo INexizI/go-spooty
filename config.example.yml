@@ -1,5 +1,7 @@
 discord:
   name:
+  app_id:
+  guild_id:
   token:
 
 spotify:
