@@ -20,5 +20,5 @@ vendor/
 # Go workspace file
 .env
 config.yml
-
-log/*.log
+*.log
+internal/log/*.log
