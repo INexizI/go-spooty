@@ -20,7 +20,7 @@ var (
 	song     spotify.Song
 )
 
-func songArtists() string {
+func SongArtists() string {
 	json.Unmarshal([]byte(spotify.GetPlaybackState()), &song)
 	artist := ""
 	for i, art := range song.Item.Artists {
@@ -72,10 +72,10 @@ func Run() {
 }
 
 func Messages(sess *discordgo.Session, m *discordgo.MessageCreate) {
-	logg.MessageLogger.Printf("%s: %s", m.Author.Username, m.Content)
-
 	if m.Author.ID == sess.State.User.ID {
 		return
+	} else {
+		logg.MessageLogger.Printf("%s: %s", m.Author.Username, m.Content)
 	}
 
 	if m.Content == "1" {
@@ -83,42 +83,52 @@ func Messages(sess *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 }
 
-func embedMessage() []*discordgo.MessageEmbed {
+func EmbedMessageSpotify() []*discordgo.MessageEmbed {
 	json.Unmarshal([]byte(spotify.GetPlaybackState()), &song)
 
-	embed := []*discordgo.MessageEmbed{{
-		URL:   song.Item.External.URL,
-		Type:  discordgo.EmbedTypeRich,
-		Title: "Spotify",
-		// Description:
-		// Timestamp:
-		Color: 5763719,
-		// Footer:
-		Image: &discordgo.MessageEmbedImage{
-			URL:    song.Item.Album.Images[0].URL,
-			Width:  song.Item.Album.Images[0].Width,
-			Height: song.Item.Album.Images[0].Height,
-		},
-		// Thumbnail:
-		// Video:
-		// Provider:
-		// Author:
-		Fields: []*discordgo.MessageEmbedField{
-			{
-				// Name:   "Title",
-				Value:  song.Item.Name,
-				Inline: true,
+	if song.Playing {
+		embed := []*discordgo.MessageEmbed{{
+			URL:   song.Item.External.URL,
+			Type:  discordgo.EmbedTypeRich,
+			Title: "Spotify",
+			// Description:
+			// Timestamp:
+			Color: 5763719,
+			// Footer:
+			Image: &discordgo.MessageEmbedImage{
+				URL:    song.Item.Album.Images[0].URL,
+				Width:  song.Item.Album.Images[0].Width,
+				Height: song.Item.Album.Images[0].Height,
 			},
-			{
-				// Name:   "Artist",
-				Value:  songArtists(),
-				Inline: false,
+			// Thumbnail:
+			// Video:
+			// Provider:
+			// Author:
+			Fields: []*discordgo.MessageEmbedField{
+				{
+					// Name:   "Title",
+					Value:  song.Item.Name,
+					Inline: true,
+				},
+				{
+					// Name:   "Artist",
+					Value:  SongArtists(),
+					Inline: false,
+				},
 			},
 		},
-	},
+		}
+		return embed
+	} else {
+		embed := []*discordgo.MessageEmbed{{
+			Type:        discordgo.EmbedTypeRich,
+			Title:       "Something went wrong!",
+			Description: "Please try again later!",
+			Color:       15548997,
+		},
+		}
+		return embed
 	}
-
-	return embed
 }
 
 func Commands(sess *discordgo.Session, i *discordgo.InteractionCreate) {
@@ -128,9 +138,9 @@ func Commands(sess *discordgo.Session, i *discordgo.InteractionCreate) {
 		err := sess.InteractionRespond(
 			i.Interaction,
 			&discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Type: 4, // discordgo.InteractionResponseChannelMessageWithSource = 4
 				Data: &discordgo.InteractionResponseData{
-					Embeds: embedMessage(),
+					Embeds: EmbedMessageSpotify(),
 				},
 			},
 		)
@@ -148,6 +158,7 @@ func Commands(sess *discordgo.Session, i *discordgo.InteractionCreate) {
 				},
 			},
 		)
+		logg.CommandLogger.Printf("first command")
 		if err != nil {
 			logg.SystemLogger.Println(err)
 		}
@@ -161,8 +172,36 @@ func Commands(sess *discordgo.Session, i *discordgo.InteractionCreate) {
 				},
 			},
 		)
+		logg.CommandLogger.Printf("second command")
 		if err != nil {
 			logg.SystemLogger.Println(err)
 		}
+	default:
+		err := sess.InteractionRespond(
+			i.Interaction,
+			&discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseType(i.ApplicationCommandData().Options[0].IntValue()),
+			},
+		)
+		if err != nil {
+			sess.FollowupMessageCreate(
+				i.Interaction,
+				true,
+				&discordgo.WebhookParams{
+					Content: "Something went wrong",
+				},
+			)
+		}
+		return
 	}
 }
+
+// func Roles(sess *discordgo.Session, ra *discordgo.MessageReactionAdd, rr *discordgo.MessageReactionRemove) {
+// 	if ra.Emoji.Name == "" {
+// 		sess.GuildMemberRoleAdd(ra.GuildID, ra.UserID, "roleID")
+// 		sess.ChannelMessageSend(ra.ChannelID, fmt.Sprintf("%v has been added to %v", ra.UserID, ra.Emoji.Name))
+
+// 		sess.GuildMemberRoleRemove(rr.GuildID, rr.UserID, "roleID")
+// 		sess.ChannelMessageSend(rr.ChannelID, fmt.Sprintf("%v has been removed to %v", rr.UserID, rr.Emoji.Name))
+// 	}
+// }
