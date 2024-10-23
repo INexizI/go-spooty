@@ -4,7 +4,7 @@ import (
 	b64 "encoding/base64"
 	"encoding/json"
 	"fmt"
-	logg "go-spooty/log"
+	logg "go-spooty/internal/log"
 	"io"
 	"net/http"
 	"net/url"

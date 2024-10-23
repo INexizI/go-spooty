@@ -1,6 +1,6 @@
 module go-spooty
 
-go 1.22.1
+go 1.22.2
 
 require (
 	github.com/bwmarrin/discordgo v0.27.1

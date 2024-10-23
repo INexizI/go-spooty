@@ -3,8 +3,8 @@ package bot
 import (
 	"encoding/json"
 	"fmt"
-	spotify "go-spooty/Spotify"
-	logg "go-spooty/log"
+	logg "go-spooty/internal/log"
+	spotify "go-spooty/internal/spotify"
 	"os"
 	"os/signal"
 	"syscall"

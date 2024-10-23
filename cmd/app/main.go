@@ -1,9 +1,9 @@
 package main
 
 import (
-	bot "go-spooty/Bot"
-	spotify "go-spooty/Spotify"
-	logg "go-spooty/log"
+	bot "go-spooty/internal/bot"
+	logg "go-spooty/internal/log"
+	spotify "go-spooty/internal/spotify"
 	"os"
 
 	"gopkg.in/yaml.v2"
@@ -28,7 +28,7 @@ type Config struct {
 }
 
 func main() {
-	f, err := os.Open("config.yml")
+	f, err := os.Open("config/config.yml")
 	if err != nil {
 		logg.SystemLogger.Fatal(err)
 	}
