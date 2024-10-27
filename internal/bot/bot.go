@@ -5,12 +5,20 @@ import (
 	"fmt"
 	logg "go-spooty/internal/log"
 	spotify "go-spooty/internal/spotify"
+	"log"
+	"math/rand"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/bwmarrin/discordgo"
 )
+
+type Quote struct {
+	Text  string
+	Title string
+	Name  string
+}
 
 var (
 	BotName  string
@@ -47,6 +55,10 @@ func Run() {
 			Description: "Get current Spotify song",
 		},
 		{
+			Name:        "quote",
+			Description: "Get random quote",
+		},
+		{
 			Name:        "first",
 			Description: "Showcase of a first slash command",
 		},
@@ -61,6 +73,7 @@ func Run() {
 
 	session.AddHandler(Messages)
 	session.AddHandler(Commands)
+	// session.AddHandler(Roles)
 	session.Open()
 	defer session.Close()
 
@@ -76,10 +89,6 @@ func Messages(sess *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	} else {
 		logg.MessageLogger.Printf("%s: %s", m.Author.Username, m.Content)
-	}
-
-	if m.Content == "1" {
-		sess.ChannelMessageSend(m.ChannelID, "2")
 	}
 }
 
@@ -144,6 +153,47 @@ func Commands(sess *discordgo.Session, i *discordgo.InteractionCreate) {
 				},
 			},
 		)
+		if err != nil {
+			logg.SystemLogger.Println(err)
+		}
+	case "quote":
+		file, err := os.ReadFile("internal/bot/quotes.json")
+		if err != nil {
+			log.Fatal("Error when opening file: ", err)
+		}
+
+		var data []Quote
+		err = json.Unmarshal(file, &data)
+		if err != nil {
+			log.Fatal("Error during Unmarshal(): ", err)
+		}
+
+		selection := rand.Intn(len(data))
+		log.Printf("%v", data[selection])
+
+		err = sess.InteractionRespond(
+			i.Interaction,
+			&discordgo.InteractionResponse{
+				Type: 4, // discordgo.InteractionResponseChannelMessageWithSource = 4
+				Data: &discordgo.InteractionResponseData{
+					Embeds: []*discordgo.MessageEmbed{{
+						Color: 2123412,
+						Fields: []*discordgo.MessageEmbedField{
+							{
+								Value: "> **" + data[selection].Text + "**",
+							},
+							{
+								Value: "||" + data[selection].Name + "||",
+							},
+							{
+								Value: "||" + data[selection].Title + "||",
+							},
+						},
+					}},
+				},
+			},
+		)
+		logg.CommandLogger.Printf("quote command")
 		if err != nil {
 			logg.SystemLogger.Println(err)
 		}
