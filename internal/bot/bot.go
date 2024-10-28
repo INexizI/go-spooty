@@ -99,11 +99,14 @@ func EmbedMessageSpotify() []*discordgo.MessageEmbed {
 		embed := []*discordgo.MessageEmbed{{
 			URL:   song.Item.External.URL,
 			Type:  discordgo.EmbedTypeRich,
-			Title: "Spotify",
+			Title: song.Item.Name,
 			// Description:
 			// Timestamp:
 			Color: 5763719,
-			// Footer:
+			Footer: &discordgo.MessageEmbedFooter{
+				IconURL: "https://storage.googleapis.com/pr-newsroom-wp/1/2023/05/Spotify_Primary_Logo_RGB_Green-300x300.png",
+				Text:    "Listening on Spotify",
+			},
 			Image: &discordgo.MessageEmbedImage{
 				URL:    song.Item.Album.Images[0].URL,
 				Width:  song.Item.Album.Images[0].Width,
@@ -112,18 +115,8 @@ func EmbedMessageSpotify() []*discordgo.MessageEmbed {
 			// Thumbnail:
 			// Video:
 			// Provider:
-			// Author:
-			Fields: []*discordgo.MessageEmbedField{
-				{
-					// Name:   "Title",
-					Value:  song.Item.Name,
-					Inline: true,
-				},
-				{
-					// Name:   "Artist",
-					Value:  SongArtists(),
-					Inline: false,
-				},
+			Author: &discordgo.MessageEmbedAuthor{
+				Name: SongArtists(),
 			},
 		},
 		}
@@ -177,18 +170,11 @@ func Commands(sess *discordgo.Session, i *discordgo.InteractionCreate) {
 				Type: 4, // discordgo.InteractionResponseChannelMessageWithSource = 4
 				Data: &discordgo.InteractionResponseData{
 					Embeds: []*discordgo.MessageEmbed{{
-						Color: 2123412,
-						Fields: []*discordgo.MessageEmbedField{
-							{
-								Value: "> **" + data[selection].Text + "**",
-							},
-							{
-								Value: "||" + data[selection].Name + "||",
-							},
-							{
-								Value: "||" + data[selection].Title + "||",
-							},
+						Title: data[selection].Text,
+						Author: &discordgo.MessageEmbedAuthor{
+							Name: data[selection].Name + " (" + data[selection].Title + ")",
 						},
+						Color: 2123412,
 					}},
 				},
 			},
