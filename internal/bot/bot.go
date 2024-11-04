@@ -34,6 +34,27 @@ var (
 	DM       map[string]Direct = map[string]Direct{}
 )
 
+func CommandList() []*discordgo.ApplicationCommand {
+	return []*discordgo.ApplicationCommand{
+		{
+			Name:        "song",
+			Description: "Get current Spotify song",
+		},
+		{
+			Name:        "quote",
+			Description: "Get random quote",
+		},
+		{
+			Name:        "first",
+			Description: "Showcase of a first slash command",
+		},
+		{
+			Name:        "second",
+			Description: "Showcase of a second slash command",
+		},
+	}
+}
+
 func (d *Direct) ToDirectMessageUser() discordgo.MessageEmbed {
 	return discordgo.MessageEmbed{
 		Title: "Your Name & Login:",
@@ -69,7 +90,7 @@ func Messages(s *discordgo.Session, m *discordgo.MessageCreate) {
 		logg.MessageLogger.Printf("%s: %s", m.Author.Username, m.Content)
 	}
 
-	if m.Content == "qwe" {
+	if m.Content == "token" {
 		DirectMessages(s, m)
 	}
 
@@ -285,24 +306,7 @@ func Run() {
 		logg.SystemLogger.Fatal(err)
 	}
 
-	_, err = session.ApplicationCommandBulkOverwrite(BotApp, BotGuild, []*discordgo.ApplicationCommand{
-		{
-			Name:        "song",
-			Description: "Get current Spotify song",
-		},
-		{
-			Name:        "quote",
-			Description: "Get random quote",
-		},
-		{
-			Name:        "first",
-			Description: "Showcase of a first slash command",
-		},
-		{
-			Name:        "second",
-			Description: "Showcase of a second slash command",
-		},
-	})
+	_, err = session.ApplicationCommandBulkOverwrite(BotApp, BotGuild, CommandList())
 	if err != nil {
 		logg.SystemLogger.Println(err)
 	}
