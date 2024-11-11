@@ -208,7 +208,7 @@ func Commands(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			&discordgo.InteractionResponse{
 				Type: 4, // discordgo.InteractionResponseChannelMessageWithSource = 4
 				Data: &discordgo.InteractionResponseData{
-					Embeds: []*discordgo.MessageEmbed{{
+					Embeds: []*discordgo.MessageEmbed{{ // Must be 256 or fewer in length.
 						Title: data[selection].Text,
 						Author: &discordgo.MessageEmbedAuthor{
 							Name: data[selection].Name + " (" + data[selection].Title + ")",
